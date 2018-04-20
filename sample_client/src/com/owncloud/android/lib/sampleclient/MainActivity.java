@@ -276,35 +276,6 @@ public class MainActivity extends Activity implements OnRemoteOperationListener,
 				e.printStackTrace();
 			}
 		});
-
-//		mOkHttpClient.newCall(request).enqueue(new Callback() {
-//
-//			@Override public void onResponse(Call call, final Response response) throws IOException {
-//
-//				if (!response.isSuccessful()) {
-//
-//					showMessage("Response not successful with code: " + response.code());
-//
-//					throw new IOException("Unexpected code " + response);
-//
-//				} else { // Successful response
-//
-//					final String propFindResult = response.body().string();
-//
-//					showMessage(propFindResult);
-//
-//					Headers responseHeaders = response.headers();
-//					for (int i = 0, size = responseHeaders.size(); i < size; i++) {
-//						System.out.println(responseHeaders.name(i) + ": " + responseHeaders.value(i));
-//					}
-//				}
-//			}
-//
-//			@Override public void onFailure(Call call, IOException e) {
-//				showMessage("Something was wrong: " + e.toString());
-//				e.printStackTrace();
-//			}
-//		});
 	}
     
     private void startUpload() {
