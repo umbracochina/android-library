@@ -56,6 +56,14 @@ import com.owncloud.android.lib.common.network.RedirectionPath;
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.lib.resources.status.OwnCloudVersion;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.Credentials;
+import okhttp3.Headers;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class OwnCloudClient extends HttpClient {
 
     public static final String WEBDAV_PATH_4_0 = "/remote.php/webdav";
@@ -85,6 +93,8 @@ public class OwnCloudClient extends HttpClient {
     private Context mContext;
     private OwnCloudAccount mAccount;
 
+    private OkHttpClient mOkHttpClient;
+
     /**
      * {@link @OwnCloudClientManager} holding a reference to this object and delivering it to callers; might be
      * NULL
@@ -109,6 +119,8 @@ public class OwnCloudClient extends HttpClient {
             throw new IllegalArgumentException("Parameter 'baseUri' cannot be NULL");
         }
         mBaseUri = baseUri;
+
+        mOkHttpClient = new OkHttpClient();
 
         mInstanceNumber = sIntanceCounter++;
         Log_OC.d(TAG + " #" + mInstanceNumber, "Creating OwnCloudClient");
@@ -251,6 +263,23 @@ public class OwnCloudClient extends HttpClient {
         //logSetCookiesAtResponse(method.getResponseHeaders());
 
         return status;
+    }
+
+    /**
+     * Perform the received request
+     *
+     * @param request to perform
+     * @param callback to get the result
+     */
+    public void performRequest (Request request, Callback callback) {
+
+        String userAgent = OwnCloudClientManagerFactory.getUserAgent();
+        String credentials = Credentials.basic(getCredentials().getUsername(), getCredentials().getUsername());
+
+        request.newBuilder().addHeader(HttpMethodParams.USER_AGENT, userAgent);
+        request.newBuilder().addHeader("Authorization", credentials);
+
+        mOkHttpClient.newCall(request).enqueue(callback);
     }
 
     private void checkFirstRedirection(HttpMethod method) {

@@ -244,14 +244,12 @@ public class MainActivity extends Activity implements OnRemoteOperationListener,
 
 		final Request request = new Request.Builder()
 				.url(getString(R.string.server_base_url) + NEW_WEBDAV_PATH + getString(R.string.username))
-				.addHeader(AUTHORIZATION_HEADER, mCredentials)
-				.addHeader(USER_AGENT_HEADER, USER_AGENT_VALUE)
 				.method("PROPFIND", null)
 				.build();
 
-		mOkHttpClient.newCall(request).enqueue(new Callback() {
-
-			@Override public void onResponse(Call call, final Response response) throws IOException {
+		mClient.performRequest(request, new Callback() {
+			@Override
+			public void onResponse(Call call, final Response response) throws IOException {
 
 				if (!response.isSuccessful()) {
 
@@ -272,11 +270,41 @@ public class MainActivity extends Activity implements OnRemoteOperationListener,
 				}
 			}
 
-			@Override public void onFailure(Call call, IOException e) {
+			@Override
+			public void onFailure(Call call, IOException e) {
 				showMessage("Something was wrong: " + e.toString());
 				e.printStackTrace();
 			}
 		});
+
+//		mOkHttpClient.newCall(request).enqueue(new Callback() {
+//
+//			@Override public void onResponse(Call call, final Response response) throws IOException {
+//
+//				if (!response.isSuccessful()) {
+//
+//					showMessage("Response not successful with code: " + response.code());
+//
+//					throw new IOException("Unexpected code " + response);
+//
+//				} else { // Successful response
+//
+//					final String propFindResult = response.body().string();
+//
+//					showMessage(propFindResult);
+//
+//					Headers responseHeaders = response.headers();
+//					for (int i = 0, size = responseHeaders.size(); i < size; i++) {
+//						System.out.println(responseHeaders.name(i) + ": " + responseHeaders.value(i));
+//					}
+//				}
+//			}
+//
+//			@Override public void onFailure(Call call, IOException e) {
+//				showMessage("Something was wrong: " + e.toString());
+//				e.printStackTrace();
+//			}
+//		});
 	}
     
     private void startUpload() {
