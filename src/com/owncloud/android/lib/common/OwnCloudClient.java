@@ -25,8 +25,17 @@
 
 package com.owncloud.android.lib.common;
 
-import java.io.IOException;
-import java.io.InputStream;
+import android.accounts.AccountManager;
+import android.accounts.AccountsException;
+import android.content.Context;
+import android.net.Uri;
+
+import com.owncloud.android.lib.common.authentication.OwnCloudCredentials;
+import com.owncloud.android.lib.common.authentication.OwnCloudCredentialsFactory;
+import com.owncloud.android.lib.common.authentication.OwnCloudCredentialsFactory.OwnCloudAnonymousCredentials;
+import com.owncloud.android.lib.common.network.RedirectionPath;
+import com.owncloud.android.lib.common.utils.Log_OC;
+import com.owncloud.android.lib.resources.status.OwnCloudVersion;
 
 import org.apache.commons.httpclient.Cookie;
 import org.apache.commons.httpclient.Header;
@@ -43,23 +52,10 @@ import org.apache.commons.httpclient.cookie.CookiePolicy;
 import org.apache.commons.httpclient.params.HttpMethodParams;
 import org.apache.commons.httpclient.params.HttpParams;
 
-import android.accounts.AccountManager;
-import android.accounts.AccountsException;
-import android.content.Context;
-import android.net.Uri;
+import java.io.IOException;
+import java.io.InputStream;
 
-import com.owncloud.android.lib.common.authentication.OwnCloudCredentials;
-import com.owncloud.android.lib.common.authentication.OwnCloudCredentialsFactory;
-import com.owncloud.android.lib.common.authentication.OwnCloudCredentialsFactory.OwnCloudAnonymousCredentials;
-import com.owncloud.android.lib.common.accounts.AccountUtils;
-import com.owncloud.android.lib.common.network.RedirectionPath;
-import com.owncloud.android.lib.common.utils.Log_OC;
-import com.owncloud.android.lib.resources.status.OwnCloudVersion;
-
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.Credentials;
-import okhttp3.Headers;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -67,6 +63,7 @@ import okhttp3.Response;
 public class OwnCloudClient extends HttpClient {
 
     public static final String WEBDAV_PATH_4_0 = "/remote.php/webdav";
+    private static final String NEW_WEBDAV_PATH = "/remote.php/dav/files/";
     public static final String STATUS_PATH = "/status.php";
     public static final String FILES_WEB_PATH = "/index.php/apps/files";
 
@@ -267,19 +264,24 @@ public class OwnCloudClient extends HttpClient {
 
     /**
      * Perform the received request
-     *
-     * @param request to perform
-     * @param callback to get the result
+     * @param request
+     * @return response for the request
      */
-    public void performRequest (Request request, Callback callback) {
+    public Response performRequest (Request request) {
 
-        String userAgent = OwnCloudClientManagerFactory.getUserAgent();
-        String credentials = Credentials.basic(getCredentials().getUsername(), getCredentials().getUsername());
+        String credentials = Credentials.basic(getCredentials().getUsername(), getCredentials().getAuthToken());
 
-        request.newBuilder().addHeader(HttpMethodParams.USER_AGENT, userAgent);
-        request.newBuilder().addHeader("Authorization", credentials);
+        Request updatedRequest = request.newBuilder().addHeader("Authorization", credentials).build();
+        
+        Response response = null;
 
-        mOkHttpClient.newCall(request).enqueue(callback);
+        try {
+            response = mOkHttpClient.newCall(updatedRequest).execute();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        
+        return response;
     }
 
     private void checkFirstRedirection(HttpMethod method) {
@@ -410,6 +412,10 @@ public class OwnCloudClient extends HttpClient {
 
     public Uri getWebdavUri() {
         return Uri.parse(mBaseUri + WEBDAV_PATH_4_0);
+    }
+
+    public Uri getNewWebdavUri() {
+        return Uri.parse(mBaseUri + NEW_WEBDAV_PATH + mCredentials.getUsername());
     }
 
     /**

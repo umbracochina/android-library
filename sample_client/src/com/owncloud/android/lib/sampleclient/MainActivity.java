@@ -237,45 +237,10 @@ public class MainActivity extends Activity implements OnRemoteOperationListener,
 
 //		Let's first use OKHttp with the new endpoint without depending on our library operations
 
-//    	ReadRemoteFolderOperation refreshOperation = new ReadRemoteFolderOperation(FileUtils.PATH_SEPARATOR);
-//    	refreshOperation.execute(mClient, this, mHandler);
-
 		if (!validServerAddress()) return;
 
-		final Request request = new Request.Builder()
-				.url(getString(R.string.server_base_url) + NEW_WEBDAV_PATH + getString(R.string.username))
-				.method("PROPFIND", null)
-				.build();
-
-		mClient.performRequest(request, new Callback() {
-			@Override
-			public void onResponse(Call call, final Response response) throws IOException {
-
-				if (!response.isSuccessful()) {
-
-					showMessage("Response not successful with code: " + response.code());
-
-					throw new IOException("Unexpected code " + response);
-
-				} else { // Successful response
-
-					final String propFindResult = response.body().string();
-
-					showMessage(propFindResult);
-
-					Headers responseHeaders = response.headers();
-					for (int i = 0, size = responseHeaders.size(); i < size; i++) {
-						System.out.println(responseHeaders.name(i) + ": " + responseHeaders.value(i));
-					}
-				}
-			}
-
-			@Override
-			public void onFailure(Call call, IOException e) {
-				showMessage("Something was wrong: " + e.toString());
-				e.printStackTrace();
-			}
-		});
+		ReadRemoteFolderOperation refreshOperation = new ReadRemoteFolderOperation(FileUtils.PATH_SEPARATOR);
+		refreshOperation.execute(mClient, this, mHandler);
 	}
     
     private void startUpload() {

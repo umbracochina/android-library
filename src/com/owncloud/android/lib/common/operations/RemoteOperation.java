@@ -191,8 +191,7 @@ public abstract class RemoteOperation implements Runnable {
      *                        the listener objects must be called.
      * @return Thread were the remote operation is executed.
      */
-    public Thread execute(OwnCloudClient client,
-                          OnRemoteOperationListener listener, Handler listenerHandler) {
+    public Thread execute(OwnCloudClient client, OnRemoteOperationListener listener, Handler listenerHandler) {
         if (client == null) {
             throw new IllegalArgumentException
                     ("Trying to execute a remote operation with a NULL OwnCloudClient");
