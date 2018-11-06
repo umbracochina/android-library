@@ -25,6 +25,9 @@
 package com.owncloud.android.lib.common.http;
 
 import android.content.Context;
+import android.security.KeyChain;
+import android.security.KeyChainAliasCallback;
+import android.security.KeyChainException;
 
 import com.owncloud.android.lib.common.OwnCloudClientManagerFactory;
 import com.owncloud.android.lib.common.http.interceptors.HttpInterceptor;
@@ -33,6 +36,10 @@ import com.owncloud.android.lib.common.network.AdvancedX509TrustManager;
 import com.owncloud.android.lib.common.network.NetworkUtils;
 import com.owncloud.android.lib.common.utils.Log_OC;
 
+import java.net.Socket;
+import java.security.Principal;
+import java.security.PrivateKey;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -41,8 +48,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509ExtendedKeyManager;
 import javax.net.ssl.X509TrustManager;
 
 import okhttp3.Cookie;
@@ -62,6 +71,7 @@ public class HttpClient {
     private static HttpInterceptor sOkHttpInterceptor;
     private static Context sContext;
     private static HashMap<String, List<Cookie>> sCookieStore = new HashMap<>();
+    public static final String DEFAULT_ALIAS = "My Key Chain";
 
     public static void setContext(Context context) {
         sContext = context;
@@ -74,10 +84,52 @@ public class HttpClient {
     public static OkHttpClient getOkHttpClient() {
         if (sOkHttpClient == null) {
             try {
-                final X509TrustManager trustManager = new AdvancedX509TrustManager(
-                        NetworkUtils.getKnownServersStore(sContext));
+                final X509Certificate[] certificates = getCertificateChain(DEFAULT_ALIAS);
+                final PrivateKey privateKey = getPrivateKey(DEFAULT_ALIAS);
+
+                final X509ExtendedKeyManager keyManager = new X509ExtendedKeyManager() {
+                    @Override
+                    public String chooseClientAlias(String[] strings, Principal[] principals, Socket socket) {
+                        return DEFAULT_ALIAS;
+                    }
+
+                    @Override
+                    public String chooseServerAlias(String s, Principal[] principals, Socket socket) {
+                        return DEFAULT_ALIAS;
+                    }
+
+                    @Override
+                    public X509Certificate[] getCertificateChain(String s) {
+                        return certificates;
+                    }
+
+                    @Override
+                    public String[] getClientAliases(String s, Principal[] principals) {
+                        return new String[]{DEFAULT_ALIAS};
+                    }
+
+                    @Override
+                    public String[] getServerAliases(String s, Principal[] principals) {
+                        return new String[]{DEFAULT_ALIAS};
+                    }
+
+                    @Override
+                    public PrivateKey getPrivateKey(String s) {
+                        return privateKey;
+                    }
+                };
+
                 final SSLContext sslContext = SSLContext.getInstance("TLS");
-                sslContext.init(null, new TrustManager[] {trustManager}, null);
+
+                final X509TrustManager trustManager = new AdvancedX509TrustManager(
+                        NetworkUtils.getKnownServersStore(sContext)
+                );
+
+                sslContext.init(
+                        new KeyManager[] {keyManager},
+                        new TrustManager[] {trustManager},
+                        null
+                );
 
                 // Automatic cookie handling, NOT PERSISTENT
                 CookieJar cookieJar = new CookieJar() {
@@ -168,5 +220,27 @@ public class HttpClient {
 
     public void clearCookies() {
         sCookieStore.clear();
+    }
+
+    private static X509Certificate[] getCertificateChain(String alias) {
+        try {
+            return KeyChain.getCertificateChain(sContext, alias);
+        } catch (KeyChainException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private static PrivateKey getPrivateKey(String alias) {
+        try {
+            return KeyChain.getPrivateKey(sContext, alias);
+        } catch (KeyChainException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 }

@@ -107,11 +107,11 @@ public class AdvancedX509TrustManager implements X509TrustManager {
         		certificates[0].checkValidity();
         	} catch (CertificateExpiredException c) {
         		result.setCertificateExpiredException(c);
-        		
+
         	} catch (CertificateNotYetValidException c) {
                 result.setCertificateNotYetException(c);
         	}
-        	
+
         	try {
         	    mStandardTrustManager.checkServerTrusted(certificates, authType);
         	} catch (CertificateException c) {
@@ -127,7 +127,7 @@ public class AdvancedX509TrustManager implements X509TrustManager {
                 	result.setOtherCertificateException(c);
                 }
         	}
-        	
+
         	if (result.isException())
         		throw result;
 
