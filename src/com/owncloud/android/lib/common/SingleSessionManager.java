@@ -120,9 +120,10 @@ public class SingleSessionManager implements OwnCloudClientManager {
             account.loadCredentials(context);
             client.setCredentials(account.getCredentials());
 
-            if (client.getCredentials() instanceof OwnCloudSamlSsoCredentials) {
+            // TODO Disable cookies for certificate PoC
+//            if (client.getCredentials() instanceof OwnCloudSamlSsoCredentials) {
                 client.disableAutomaticCookiesHandling();
-            }
+//            }
 
             if (accountName != null) {
                 mClientsWithKnownUsername.put(accountName, client);
