@@ -144,7 +144,7 @@ public class ShareXMLParser {
 	 * @throws XmlPullParserException
 	 * @throws IOException
 	 */
-	public ArrayList<OCShare> parseXMLResponse(InputStream is) throws XmlPullParserException,
+	public ArrayList<RemoteShare> parseXMLResponse(InputStream is) throws XmlPullParserException,
 			IOException {
 
 		try {
@@ -170,9 +170,9 @@ public class ShareXMLParser {
 	 * @throws XmlPullParserException
 	 * @throws IOException
 	 */
-	private ArrayList<OCShare> readOCS (XmlPullParser parser) throws XmlPullParserException,
+	private ArrayList<RemoteShare> readOCS (XmlPullParser parser) throws XmlPullParserException,
 			IOException {
-		ArrayList<OCShare> shares = new ArrayList<>();
+		ArrayList<RemoteShare> shares = new ArrayList<>();
 		parser.require(XmlPullParser.START_TAG,  ns , NODE_OCS);
 		while (parser.next() != XmlPullParser.END_TAG) {
 			if (parser.getEventType() != XmlPullParser.START_TAG) {
@@ -230,10 +230,10 @@ public class ShareXMLParser {
 	 * @throws XmlPullParserException
 	 * @throws IOException
 	 */
-	private ArrayList<OCShare> readData(XmlPullParser parser) throws XmlPullParserException,
+	private ArrayList<RemoteShare> readData(XmlPullParser parser) throws XmlPullParserException,
 			IOException {
-		ArrayList<OCShare> shares = new ArrayList<OCShare>();
-		OCShare share = null;
+		ArrayList<RemoteShare> shares = new ArrayList<RemoteShare>();
+		RemoteShare share = null;
 
 		parser.require(XmlPullParser.START_TAG, ns, NODE_DATA);		
 		//Log_OC.d(TAG, "---- NODE DATA ---");
@@ -246,7 +246,7 @@ public class ShareXMLParser {
 				readElement(parser, shares);
 				
 			}  else if (name.equalsIgnoreCase(NODE_ID)) {// Parse Create XML Response
-				share = new OCShare();
+				share = new RemoteShare();
 				String value = readNode(parser, NODE_ID);
 				share.setIdRemoteShared(Integer.parseInt(value));
 
@@ -284,11 +284,11 @@ public class ShareXMLParser {
 	 * @throws XmlPullParserException
 	 * @throws IOException
 	 */
-	private void readElement(XmlPullParser parser, ArrayList<OCShare> shares)
+	private void readElement(XmlPullParser parser, ArrayList<RemoteShare> shares)
 			throws XmlPullParserException, IOException {
 		parser.require(XmlPullParser.START_TAG, ns, NODE_ELEMENT);
 		
-		OCShare share = new OCShare();
+		RemoteShare share = new RemoteShare();
 		
 		//Log_OC.d(TAG, "---- NODE ELEMENT ---");
 		while (parser.next() != XmlPullParser.END_TAG) {
@@ -371,11 +371,11 @@ public class ShareXMLParser {
 		}
 	}
 
-	private boolean isValidShare(OCShare share) {
+	private boolean isValidShare(RemoteShare share) {
 		return (share.getRemoteId() > -1);
 	}
 
-	private void fixPathForFolder(OCShare share) {
+	private void fixPathForFolder(RemoteShare share) {
 		if (share.isFolder() && share.getPath() != null && share.getPath().length() > 0 &&
 				!share.getPath().endsWith(FileUtils.PATH_SEPARATOR)) {
 			share.setPath(share.getPath() + FileUtils.PATH_SEPARATOR);

@@ -33,7 +33,7 @@ package com.owncloud.android.lib.resources.shares;
 public class SharePermissionsBuilder {
 
     /** Set of permissions */
-    private int mPermissions = OCShare.READ_PERMISSION_FLAG;    // READ is minimum permission
+    private int mPermissions = RemoteShare.READ_PERMISSION_FLAG;    // READ is minimum permission
 
     /**
      * Sets or clears permission to reshare a file or folder.
@@ -42,7 +42,7 @@ public class SharePermissionsBuilder {
      * @return              Instance to builder itself, to allow consecutive calls to setters
      */
     public SharePermissionsBuilder setSharePermission(boolean enabled) {
-        updatePermission(OCShare.SHARE_PERMISSION_FLAG, enabled);
+        updatePermission(RemoteShare.SHARE_PERMISSION_FLAG, enabled);
         return this;
     }
 
@@ -53,7 +53,7 @@ public class SharePermissionsBuilder {
      * @return              Instance to builder itself, to allow consecutive calls to setters
      */
     public SharePermissionsBuilder setUpdatePermission(boolean enabled) {
-        updatePermission(OCShare.UPDATE_PERMISSION_FLAG, enabled);
+        updatePermission(RemoteShare.UPDATE_PERMISSION_FLAG, enabled);
         return this;
     }
 
@@ -64,7 +64,7 @@ public class SharePermissionsBuilder {
      * @return              Instance to builder itself, to allow consecutive calls to setters
      */
     public SharePermissionsBuilder setCreatePermission(boolean enabled) {
-        updatePermission(OCShare.CREATE_PERMISSION_FLAG, enabled);
+        updatePermission(RemoteShare.CREATE_PERMISSION_FLAG, enabled);
         return this;
     }
 
@@ -75,7 +75,7 @@ public class SharePermissionsBuilder {
      * @return              Instance to builder itself, to allow consecutive calls to setters
      */
     public SharePermissionsBuilder setDeletePermission(boolean enabled) {
-        updatePermission(OCShare.DELETE_PERMISSION_FLAG, enabled);
+        updatePermission(RemoteShare.DELETE_PERMISSION_FLAG, enabled);
         return this;
     }
 

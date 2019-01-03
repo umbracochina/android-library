@@ -24,14 +24,13 @@
 
 package com.owncloud.android.lib.resources.shares;
 
-import java.io.File;
-import java.io.Serializable;
-
 import android.os.Parcel;
 import android.os.Parcelable;
 
 import com.owncloud.android.lib.common.utils.Log_OC;
 import com.owncloud.android.lib.resources.files.FileUtils;
+
+import java.io.Serializable;
 
 
 /**
@@ -40,14 +39,14 @@ import com.owncloud.android.lib.resources.files.FileUtils;
  * @author masensio
  * @author David A. Velasco
  */
-public class OCShare implements Parcelable, Serializable {
+public class RemoteShare implements Parcelable, Serializable {
 
     /**
      * Generated - should be refreshed every time the class changes!!
      */
     private static final long serialVersionUID = 4124975224281327921L;
 
-    private static final String TAG = OCShare.class.getSimpleName();
+    private static final String TAG = RemoteShare.class.getSimpleName();
 
     public static final int DEFAULT_PERMISSION = -1;
     public static final int READ_PERMISSION_FLAG = 1;
@@ -96,16 +95,16 @@ public class OCShare implements Parcelable, Serializable {
     private long mRemoteId;
     private String mShareLink;
 
-    public OCShare() {
+    public RemoteShare() {
         super();
         resetData();
     }
 
-    public OCShare(String path) {
+    public RemoteShare(String path) {
         resetData();
         if (path == null || path.length() <= 0 || !path.startsWith(FileUtils.PATH_SEPARATOR)) {
-            Log_OC.e(TAG, "Trying to create a OCShare with a non valid path");
-            throw new IllegalArgumentException("Trying to create a OCShare with a non valid path: " + path);
+            Log_OC.e(TAG, "Trying to create a RemoteShare with a non valid path");
+            throw new IllegalArgumentException("Trying to create a RemoteShare with a non valid path: " + path);
         }
         mPath = path;
     }
@@ -269,15 +268,15 @@ public class OCShare implements Parcelable, Serializable {
     /**
      * Parcelable Methods
      */
-    public static final Parcelable.Creator<OCShare> CREATOR = new Parcelable.Creator<OCShare>() {
+    public static final Parcelable.Creator<RemoteShare> CREATOR = new Parcelable.Creator<RemoteShare>() {
         @Override
-        public OCShare createFromParcel(Parcel source) {
-            return new OCShare(source);
+        public RemoteShare createFromParcel(Parcel source) {
+            return new RemoteShare(source);
         }
 
         @Override
-        public OCShare[] newArray(int size) {
-            return new OCShare[size];
+        public RemoteShare[] newArray(int size) {
+            return new RemoteShare[size];
         }
     };
 
@@ -286,7 +285,7 @@ public class OCShare implements Parcelable, Serializable {
      *
      * @param source The source parcel
      */
-    protected OCShare(Parcel source) {
+    protected RemoteShare(Parcel source) {
         readFromParcel(source);
     }
 
